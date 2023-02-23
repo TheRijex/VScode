@@ -15,9 +15,21 @@ public with sharing class OpportunityPreditorLogic {
                 isDataIsQuote = true;
             }
 
-            if(isDataIsOpportunites && isDataIsQuote) {break;}
-            
+            if(isDataIsOpportunites && isDataIsQuote) {break;}  
         }
+
+
+    }
+
+    private static Map<Id, Set<Id>> getProductsIds(List<SObject> lineItems) {
+        if(lineItems.isEmpty()) {
+            return new Map<Id, Set<Id>>();
+        }
+
+        Map<Id, Set<Id>> productIdsMap = new Map<Id, Set<Id>>();
+        String           typeOfItem;
+
+        return productIdsMap;
     }
 
     private static List<SObject> collectDataFromOrg(Set<Id> incomeIds, Boolean oppoSelect, Boolean quoteSelect) {
@@ -26,6 +38,7 @@ public with sharing class OpportunityPreditorLogic {
            if(oppoSelect) {
             selectedData.addAll(Selectors.getOpportunityLineItemsFromIds(incomeIds));
            } 
+
            if (quoteSelect) {
             selectedData.addAll(Selectors.getQuoteLineItemsByQuoteId(incomeIds));
            }
