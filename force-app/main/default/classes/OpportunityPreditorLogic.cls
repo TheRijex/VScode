@@ -6,6 +6,8 @@ public with sharing class OpportunityPreditorLogic {
         Boolean                   isDataIsOpportunites = false;
         Boolean                   isDataIsQuote        = false;
 
+        Set<Id>                   productScopeIds      = new Set<Id>();
+
         for(Id incId : incIds) {
             if(incId.getSobjectType().getDescribe().getLabel() == 'Opportunity') { 
                 isDataIsOpportunites = true;
@@ -18,6 +20,10 @@ public with sharing class OpportunityPreditorLogic {
             if(isDataIsOpportunites && isDataIsQuote) {break;}  
         }
 
+        Map<Id, Set<Id>> productScope = getProductsIds(
+            collectDataFromOrg(incomeIds, isOpportunityProductsQueryNeeded, isQuoteProductsQueryNeeded)
+        );
+
 
     }
 
@@ -28,6 +34,24 @@ public with sharing class OpportunityPreditorLogic {
 
         Map<Id, Set<Id>> productIdsMap = new Map<Id, Set<Id>>();
         String           typeOfItem;
+
+        for(SObject lineItem : lineItems) {
+            if (String.isBlank(typeOfItem)) {typeOfItem = lineItem.getSObjectType().getDescribe().getName();}
+
+            Id product2Id               = (Id) lineItem.get('Product2Id');
+            Id lineItemRelatedObjectId  = (Id) lineItem.get(
+                typeOfItem == 'OpportunityLineItem'
+                ? 'OpportunityId'
+                : 'QuoteId'
+            );
+
+            if (productIdsMap.containsKey(lineItemRelatedObjectId)) {
+                productIdsMap.get(lineItemRelatedObjectId).add(product2Id);
+            } else {
+                productIdsMap.put(lineItemRelatedObjectId, new Set<Id>{product2Id});
+            }
+
+        }
 
         return productIdsMap;
     }
